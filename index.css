@@ -1,0 +1,32 @@
+body {
+    background: linear-gradient(120deg, #e0eafc, #cfdef3);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: row; 
+    border: 1px solid black;
+    width: 1000px; /* Make it small enough to wrap */
+    height: 600px;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    /* justify-content: center;
+    align-content: space-around; */
+}
+
+.box {
+    width: 280px;
+    height: 120px;
+    text-align: center;
+    border: 1px solid black;
+    margin: 10px;
+    display: flex;
+    /* align-items: center;
+    justify-content: center;     */
+    font-size: 2em;
+    font-weight: 1000;
+    align-self: flex-end;
+}
