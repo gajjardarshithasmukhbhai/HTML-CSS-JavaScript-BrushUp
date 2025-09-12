@@ -175,19 +175,288 @@ Cleaning up like this ensures the handler doesn't linger after the component unm
 
 *This article will help prepare for JavaScript interviews in 2025. The questions are based on real interview experiences and cover important frontend development concepts.*
 
+### 6. What is Event Delegation and how does it work?
+
+**Answer:** Event delegation is a technique where you attach a single event listener to a parent element to handle events for multiple child elements, including dynamically added ones.
+
+**How it works:**
+- Uses event bubbling - events bubble up from child to parent elements
+- One listener on parent handles events for all children
+- Use `event.target` to identify which child element triggered the event
+
+**Benefits:**
+- Better performance (fewer event listeners)
+- Works with dynamically added elements
+- Less memory usage
+
+Example:
+```javascript
+// Instead of adding listeners to each button
+document.getElementById('parent').addEventListener('click', function(e) {
+  if (e.target && e.target.classList.contains('button')) {
+    console.log('Button clicked:', e.target.textContent);
+  }
+});
+```
+
+### 7. Explain the difference between `var`, `let`, and `const`.
+
+**Answer:** These are different ways to declare variables in JavaScript with different scoping and behavior.
+
+| Feature | `var` | `let` | `const` |
+|---------|-------|-------|---------|
+| **Scope** | Function or Global | Block | Block |
+| **Hoisting** | Yes (undefined) | Yes (TDZ) | Yes (TDZ) |
+| **Re-declaration** | Allowed | Not allowed | Not allowed |
+| **Re-assignment** | Allowed | Allowed | Not allowed |
+| **Temporal Dead Zone** | No | Yes | Yes |
+
+Examples:
+```javascript
+// var - function scoped, can be re-declared
+var x = 1;
+var x = 2; // OK
+function test() {
+  if (true) {
+    var y = 3; // function scoped
+  }
+  console.log(y); // 3 - accessible outside block
+}
+
+// let - block scoped, cannot be re-declared
+let a = 1;
+// let a = 2; // Error: Identifier 'a' has already been declared
+if (true) {
+  let b = 3; // block scoped
+}
+// console.log(b); // Error: b is not defined
+
+// const - block scoped, cannot be re-assigned
+const c = 1;
+// c = 2; // Error: Assignment to constant variable
+const obj = { name: 'John' };
+obj.name = 'Jane'; // OK - object properties can be modified
+```
+
+### 8. What are Promises and how do they work? Explain Promise chaining.
+
+**Answer:** Promises are objects representing the eventual completion or failure of an asynchronous operation.
+
+**Promise States:**
+- **Pending**: Initial state
+- **Fulfilled**: Operation completed successfully
+- **Rejected**: Operation failed
+
+**Basic Promise:**
+```javascript
+const promise = new Promise((resolve, reject) => {
+  // Async operation
+  setTimeout(() => {
+    const success = Math.random() > 0.5;
+    if (success) {
+      resolve('Operation successful!');
+    } else {
+      reject('Operation failed!');
+    }
+  }, 1000);
+});
+
+promise
+  .then(result => console.log(result))
+  .catch(error => console.log(error));
+```
+
+**Promise Chaining:**
+```javascript
+fetch('/api/user/1')
+  .then(response => response.json())
+  .then(user => fetch(`/api/posts/${user.id}`))
+  .then(response => response.json())
+  .then(posts => {
+    console.log('User posts:', posts);
+    return posts.length;
+  })
+  .then(count => console.log(`Total posts: ${count}`))
+  .catch(error => console.error('Error:', error));
+```
+
+**Promise.all() and Promise.race():**
+```javascript
+// Promise.all - waits for all promises
+Promise.all([promise1, promise2, promise3])
+  .then(results => console.log('All completed:', results));
+
+// Promise.race - returns first completed promise
+Promise.race([promise1, promise2, promise3])
+  .then(result => console.log('First completed:', result));
+```
+
+### 9. What is the difference between `==` and `===` in JavaScript?
+
+**Answer:** These are comparison operators with different behavior regarding type coercion.
+
+**`==` (Loose Equality):**
+- Performs type coercion before comparison
+- Converts operands to the same type, then compares
+
+**`===` (Strict Equality):**
+- No type coercion
+- Compares both value and type
+- Recommended for most comparisons
+
+**Examples:**
+```javascript
+// Loose equality (==) - performs type coercion
+console.log(5 == '5');        // true (string '5' converted to number)
+console.log(true == 1);       // true (boolean true converted to 1)
+console.log(null == undefined); // true (special case)
+console.log(0 == false);      // true (false converted to 0)
+console.log('' == false);     // true (empty string converted to 0)
+
+// Strict equality (===) - no type coercion
+console.log(5 === '5');       // false (different types)
+console.log(true === 1);      // false (different types)
+console.log(null === undefined); // false (different types)
+console.log(0 === false);     // false (different types)
+console.log('' === false);    // false (different types)
+```
+
+**Type Coercion Rules for `==`:**
+```javascript
+// String to Number
+console.log('123' == 123);    // true
+
+// Boolean to Number
+console.log(true == 1);       // true
+console.log(false == 0);      // true
+
+// Object to Primitive
+console.log([1,2,3] == '1,2,3'); // true
+
+// Special cases
+console.log(NaN == NaN);      // false (even with ===)
+console.log(+0 === -0);       // true
+```
+
+### 10. Explain Closures in JavaScript with examples.
+
+**Answer:** A closure is a function that has access to variables from its outer (enclosing) scope even after the outer function has finished executing.
+
+**How Closures Work:**
+- Inner function maintains reference to outer function's variables
+- Creates a private scope
+- Variables remain in memory due to closure reference
+
+**Basic Example:**
+```javascript
+function outerFunction(x) {
+  // Outer function's variable
+  let outerVariable = x;
+  
+  // Inner function (closure)
+  function innerFunction(y) {
+    // Can access both outer and inner variables
+    return outerVariable + y;
+  }
+  
+  return innerFunction;
+}
+
+const addFive = outerFunction(5);
+console.log(addFive(3)); // 8 - still has access to outerVariable
+```
+
+**Practical Examples:**
+
+**1. Data Privacy:**
+```javascript
+function createCounter() {
+  let count = 0; // Private variable
+  
+  return {
+    increment: () => ++count,
+    decrement: () => --count,
+    getCount: () => count
+  };
+}
+
+const counter = createCounter();
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.getCount());  // 2
+// console.log(counter.count);    // undefined - private!
+```
+
+**2. Function Factories:**
+```javascript
+function multiplyBy(multiplier) {
+  return function(number) {
+    return number * multiplier;
+  };
+}
+
+const double = multiplyBy(2);
+const triple = multiplyBy(3);
+
+console.log(double(5)); // 10
+console.log(triple(5)); // 15
+```
+
+**3. Module Pattern:**
+```javascript
+const userModule = (function() {
+  let users = []; // Private data
+  
+  return {
+    addUser: function(user) {
+      users.push(user);
+    },
+    getUsers: function() {
+      return [...users]; // Return copy to prevent external modification
+    },
+    getUserCount: function() {
+      return users.length;
+    }
+  };
+})();
+
+userModule.addUser({ name: 'John', age: 30 });
+console.log(userModule.getUserCount()); // 1
+```
+
+**Common Closure Gotcha:**
+```javascript
+// Problem: All buttons alert "3"
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100); // 3, 3, 3
+}
+
+// Solution 1: Use let (block scope)
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100); // 0, 1, 2
+}
+
+// Solution 2: Use closure with IIFE
+for (var i = 0; i < 3; i++) {
+  (function(index) {
+    setTimeout(() => console.log(index), 100); // 0, 1, 2
+  })(i);
+}
+```
+
 ---
 
-## Part 2: Questions 6-10
+## Part 2: Questions 11-15
 *Coming Soon...*
 
-## Part 3: Questions 11-15
+## Part 2: Questions 11-15
 *Coming Soon...*
 
-## Part 4: Questions 16-20
+## Part 3: Questions 16-20
 *Coming Soon...*
 
-## Part 5: Questions 21-25
+## Part 4: Questions 21-25
 *Coming Soon...*
 
-## Part 6: Questions 26-30
+## Part 5: Questions 26-30
 *Coming Soon...*
